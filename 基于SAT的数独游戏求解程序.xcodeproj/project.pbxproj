@@ -23,6 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C601AC12234C7F900633DCF /* cnfSolver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cnfSolver.h; sourceTree = "<group>"; };
 		4C6C4645221EDE3D0003CF6D /* 基于SAT的数独游戏求解程序 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "基于SAT的数独游戏求解程序"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C6C4648221EDE3D0003CF6D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				4C6C4648221EDE3D0003CF6D /* main.c */,
+				4C601AC12234C7F900633DCF /* cnfSolver.h */,
 			);
 			path = "基于SAT的数独游戏求解程序";
 			sourceTree = "<group>";
