@@ -33,7 +33,7 @@ struct clauseSet readCnfCreateClauseSet(char *);
 struct literal * createLiteral(int);
 struct clause * createClause(struct literal *);
 void traverseClauseSet(struct clauseSet);
-int findUnitLiteral(struct clauseSet);
+
 
 
 // +++++++++++++++++++++++++++++++++++DPLL related++++++++++++++++++++++++++++++++++++++++++++++
@@ -41,7 +41,7 @@ int findUnitLiteral(struct clauseSet);
 struct result;
 struct result
 {
-    int satOrNot; // 0 means unsatisfiable, 1 means satistiable
+    int satOrNot; // 0 means unsatisfiable, 1 means satistiable, -1 means undecided
     int noOfLiteral;
     int * arrHead; //
 };
@@ -49,16 +49,27 @@ struct result
 struct backTrackStackNode;
 struct backTrackStackNode
 {
-    struct clauseSet * data;
+    struct clauseSet data;
     struct backTrackStackNode * next;
 };
+struct backTrackStackNode * push(struct backTrackStackNode *, struct clauseSet);
+struct backTrackStackNode * pop(struct backTrackStackNode *, struct clauseSet *);
 
 
 struct result DPLL(struct clauseSet);
 
-struct clauseSet unitPropagation(struct clauseSet, int);
+struct clauseSet unitPropagation(struct clauseSet, int, struct result *);
+int findUnitLiteral(struct clauseSet, struct result *);
+void freeLiteral(struct literal *);
+void freeClause(struct clause *);
 
-
+struct branchStackNode
+{
+    int theOtherChoice;
+    struct branchStackNode * next;
+};
+struct branchStackNode * branchStackPush(struct branchStackNode *, int);
+struct branchStackNode * branchStackPop(struct branchStackNode *, int *);
 
 #endif
 
