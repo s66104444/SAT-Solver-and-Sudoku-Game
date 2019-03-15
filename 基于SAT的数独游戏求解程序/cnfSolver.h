@@ -29,7 +29,7 @@ struct clauseSet
 // data structure related++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /* read a cnf file, and store the data in the clauseSet data structure, return a
  pointer pointed to the new clauseSet */
-struct clauseSet readCnfCreateClauseSet(char *);
+struct clauseSet readCnfCreateClauseSet(const char *);
 struct literal * createLiteral(int);
 struct clause * createClause(struct literal *);
 void traverseClauseSet(struct clauseSet);
@@ -70,6 +70,11 @@ struct branchStackNode
 };
 struct branchStackNode * branchStackPush(struct branchStackNode *, int);
 struct branchStackNode * branchStackPop(struct branchStackNode *, int *);
+/* write the result of DPLL to a file */
+void writeToFile(const char *, int, int *, int, double);
+char * changeExtension(const char *);
 
+/* check the validation of the result, valid return 1, invalid return 0 */
+int checkValidation(struct clauseSet, const char *);
 #endif
 
