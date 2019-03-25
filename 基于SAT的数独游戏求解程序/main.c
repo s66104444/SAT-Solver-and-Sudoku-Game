@@ -6,10 +6,6 @@
 
 int main(int argc, char const *argv[])
 {
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/S/7cnf20_90000_90000_7.shuffled-20.cnf");
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("test.cnf");
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("test_findUnitLiteral.cnf");
-    
     /*    stack test
     struct clauseSet oneClauseSet = readCnfCreateClauseSet("test_stack_1.cnf");
     struct clauseSet otherClauseSet = readCnfCreateClauseSet("test_stack_2.cnf");
@@ -22,7 +18,7 @@ int main(int argc, char const *argv[])
     traverseClauseSet(testClauseSet);
     aStack = pop(aStack, &testClauseSet);
     traverseClauseSet(testClauseSet);
-    */
+     end stack test */
      
      
     /* traverse and findUnitLiteral test
@@ -63,16 +59,21 @@ int main(int argc, char const *argv[])
         printf("\n%d\n", theResult.arrHead[index]);
           end of test unitPropagation       */
     
-    
-    const char * fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/性能测试/ais10.cnf";
+    //const char * fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/性能测试/sud00009.cnf";
+    //const char * fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/性能测试/ais10.cnf";
+    //const char * fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/功能测试/unsat-5cnf-30.cnf";
+    //const char * fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/功能测试/sat-20.cnf";
     /*         DPLL test     */
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/S/problem1-20.cnf");
+    //fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/S/problem1-20.cnf";
     
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/基准算例/性能测试/ais10.cnf");
+    //const char *fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/M/bart17.shuffled-231.cnf";
+    //const char *fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/M/ec-mod2c-rand3bip-sat-250-2.shuffled-as.sat05-2534.cnf";
+    //const char *fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/M/m-mod2c-rand3bip-sat-220-3.shuffled-as.sat05-2490-311.cnf";
+    const char *fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/M/problem12-200.cnf";
+    //const char *fileName = "/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/M/sud00009.cnf";
+    //const char * fileName = "validationTest.cnf";
+    
     struct clauseSet currentClauseSet = readCnfCreateClauseSet(fileName);
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/不满足算例/u-homer14.shuffled-300.cnf");
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("/Users/zhugod/Desktop/课设/综合程序设计任务及指导学生包/SAT测试备选算例/满足算例/L/ec-iso-ukn009.shuffled-as.sat05-3632-1584.cnf");
-    //struct clauseSet currentClauseSet = readCnfCreateClauseSet("test_DPLL.cnf");
     traverseClauseSet(currentClauseSet);
     
     // theResult
@@ -92,26 +93,28 @@ int main(int argc, char const *argv[])
     // end theResult
     clock_t t;
     t = clock();
-    
-    
     theResult = DPLL(currentClauseSet);
+    t = clock() - t;
+    double timeTaken = 1000*((double)t)/CLOCKS_PER_SEC; // in milliseconds
+    printf("\nDPLL 耗时: %f ms\n", timeTaken);
     
-    printf("\nsatOrNot: %d\n", theResult.satOrNot);
+    printf("\nSAT or Not: %d\n", theResult.satOrNot);
     /*
     int index;
     for (index=0; index<theResult.noOfLiteral; index++)
         printf("\n%d : %d\n", index+1, theResult.arrHead[index]);
     */
-    t = clock() - t;
-    double timeTaken = 1000*((double)t)/CLOCKS_PER_SEC; // in milliseconds
-    printf("\nDPLL() took %f milliseconds to execute \n", timeTaken);
     /*         end DPLL test        */
     
     /* write to file test */
-    writeToFile(fileName, theResult.satOrNot, theResult.arrHead, theResult.noOfLiteral, timeTaken);
+    if (theResult.satOrNot == 1)
+        writeToFile(fileName, theResult.satOrNot, theResult.arrHead, theResult.noOfLiteral, timeTaken);
+    /* end write to file test */
     
-    
-    /* write to file test */
+    /* validation function test */
+    currentClauseSet = readCnfCreateClauseSet(fileName);
+    printf("\n验证结果: %d\n\n", checkValidation(currentClauseSet, theResult));
+    /* end validation function test */
     
     return 0;
 }

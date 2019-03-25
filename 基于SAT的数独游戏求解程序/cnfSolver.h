@@ -37,7 +37,7 @@ void traverseClauseSet(struct clauseSet);
 
 
 // +++++++++++++++++++++++++++++++++++DPLL related++++++++++++++++++++++++++++++++++++++++++++++
-/* use DPLL algorithm to solve a SAT problem */
+/* result structure */
 struct result;
 struct result
 {
@@ -45,36 +45,32 @@ struct result
     int noOfLiteral;
     int * arrHead; //
 };
+/* end result structure */
 
+/* back track related */
 struct backTrackStackNode;
 struct backTrackStackNode
 {
     struct clauseSet data;
+    int otherChoice;
     struct backTrackStackNode * next;
 };
-struct backTrackStackNode * push(struct backTrackStackNode *, struct clauseSet);
-struct backTrackStackNode * pop(struct backTrackStackNode *, struct clauseSet *);
+struct backTrackStackNode * push(struct backTrackStackNode *, struct clauseSet, int);
+struct backTrackStackNode * pop(struct backTrackStackNode *, struct clauseSet *, int *);
+/* end back track related */
 
 
 struct result DPLL(struct clauseSet);
-
 struct clauseSet unitPropagation(struct clauseSet, int, struct result *);
 int findUnitLiteral(struct clauseSet, struct result *);
 void freeLiteral(struct literal *);
 void freeClause(struct clause *);
 
-struct branchStackNode
-{
-    int theOtherChoice;
-    struct branchStackNode * next;
-};
-struct branchStackNode * branchStackPush(struct branchStackNode *, int);
-struct branchStackNode * branchStackPop(struct branchStackNode *, int *);
-/* write the result of DPLL to a file */
+/* write the result of DPLL to a res file */
 void writeToFile(const char *, int, int *, int, double);
 char * changeExtension(const char *);
 
 /* check the validation of the result, valid return 1, invalid return 0 */
-int checkValidation(struct clauseSet, const char *);
+int checkValidation(struct clauseSet aClauseSet, struct result theResult);
 #endif
 

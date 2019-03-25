@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4C601AC3223BA92200633DCF /* cnfSolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C601AC2223BA92200633DCF /* cnfSolver.c */; };
 		4C6C4649221EDE3D0003CF6D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4C6C4648221EDE3D0003CF6D /* main.c */; };
+		4CC29EFE223BC53C004CBFF5 /* generateSudoku.c in Sources */ = {isa = PBXBuildFile; fileRef = 4CC29EFD223BC53C004CBFF5 /* generateSudoku.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,8 @@
 		4C601AC2223BA92200633DCF /* cnfSolver.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cnfSolver.c; sourceTree = "<group>"; };
 		4C6C4645221EDE3D0003CF6D /* 基于SAT的数独游戏求解程序 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "基于SAT的数独游戏求解程序"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C6C4648221EDE3D0003CF6D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		4CC29EFC223BC53C004CBFF5 /* generateSudoku.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = generateSudoku.h; sourceTree = "<group>"; };
+		4CC29EFD223BC53C004CBFF5 /* generateSudoku.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = generateSudoku.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,8 @@
 				4C6C4648221EDE3D0003CF6D /* main.c */,
 				4C601AC12234C7F900633DCF /* cnfSolver.h */,
 				4C601AC2223BA92200633DCF /* cnfSolver.c */,
+				4CC29EFC223BC53C004CBFF5 /* generateSudoku.h */,
+				4CC29EFD223BC53C004CBFF5 /* generateSudoku.c */,
 			);
 			path = "基于SAT的数独游戏求解程序";
 			sourceTree = "<group>";
@@ -124,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C601AC3223BA92200633DCF /* cnfSolver.c in Sources */,
+				4CC29EFE223BC53C004CBFF5 /* generateSudoku.c in Sources */,
 				4C6C4649221EDE3D0003CF6D /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

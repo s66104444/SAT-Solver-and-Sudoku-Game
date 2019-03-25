@@ -176,7 +176,6 @@ int findUnitLiteral(struct clauseSet aClauseSet, struct result * resultPtr)
 
 
 // ++++++++++++++++++++++++++++++++++++++++++DPLL related
-
 struct result DPLL(struct clauseSet currentClauseSet)
 {
     // initialize the result
@@ -190,6 +189,7 @@ struct result DPLL(struct clauseSet currentClauseSet)
         theResult.satOrNot = 1;
         return theResult;
     }
+    
     theResult.arrHead = (int *) malloc(theResult.noOfLiteral * sizeof(int));
     int i;
     for (i = 0; i < theResult.noOfLiteral; i++)
@@ -198,33 +198,13 @@ struct result DPLL(struct clauseSet currentClauseSet)
     }
     // end result initialization
     
-    // initialize the backtrack stack
-    struct backTrackStackNode * aStack = NULL;
-    
     int aUnitLiteral = 0;
-    // unit rule
-    while ( (aUnitLiteral = findUnitLiteral(currentClauseSet, &theResult)) )
-    {
-        if (theResult.satOrNot != -1)
-            return theResult;
-        
-        theResult.arrHead[abs(aUnitLiteral)-1] = aUnitLiteral > 0 ? 1 : 0;
-        currentClauseSet = unitPropagation(currentClauseSet, aUnitLiteral, &theResult);
-        
-        if (theResult.satOrNot != -1)
-            return theResult;
-    }
     
-    aStack = push(aStack, currentClauseSet);
-    
+    // initialize the backtrack stack
     int branchLiteral = currentClauseSet.firstClause->firstLiteral->theLiteral;
-    
-    //struct clause * choosenClause = NULL;
-    //struct literal * choosenLiteral = NULL;
-    
-    struct branchStackNode * branchStack = NULL;
-    branchStack = branchStackPush(branchStack, -branchLiteral);
-    //int theOtherChoice = 0;
+    struct backTrackStackNode * aStack = NULL;
+    aStack = push(aStack, currentClauseSet, -branchLiteral);
+    // end
     
     while (1)
     {
@@ -244,8 +224,7 @@ struct result DPLL(struct clauseSet currentClauseSet)
         {
             if (aStack != NULL)
             {
-                aStack = pop(aStack, &currentClauseSet);
-                branchStack = branchStackPop(branchStack, &branchLiteral);
+                aStack = pop(aStack, &currentClauseSet, &branchLiteral);
                 continue;
             }
         }
@@ -264,8 +243,7 @@ struct result DPLL(struct clauseSet currentClauseSet)
         {
             if (aStack != NULL)
             {
-                aStack = pop(aStack, &currentClauseSet);
-                branchStack = branchStackPop(branchStack, &branchLiteral);
+                aStack = pop(aStack, &currentClauseSet, &branchLiteral);
                 continue;
             }
             return theResult;
@@ -273,11 +251,8 @@ struct result DPLL(struct clauseSet currentClauseSet)
         if (theResult.satOrNot == 1)
             return theResult;
         
-        
-        aStack = push(aStack, currentClauseSet);
         branchLiteral = currentClauseSet.firstClause->firstLiteral->theLiteral;
-        branchStack = branchStackPush(branchStack, - branchLiteral);
-        
+        aStack = push(aStack, currentClauseSet, -branchLiteral);
     }
     
     
@@ -286,34 +261,28 @@ struct result DPLL(struct clauseSet currentClauseSet)
 
 
 
-struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLiteral, struct result * resultPtr)
+struct clauseSet unitPropagation(struct clauseSet aClauseSet, int aUnitLiteral, struct result * resultPtr)
 {
-    resultPtr->satOrNot = -1;
-    
-    struct clause * currentClausePtr = currentClauseSet.firstClause;
+    struct clause * currentClausePtr = aClauseSet.firstClause;
     if (currentClausePtr == NULL)
     {
         resultPtr->satOrNot = 1;
-        return currentClauseSet;
+        return aClauseSet;
     }
     if (currentClausePtr->firstLiteral == NULL)
     {
         resultPtr->satOrNot = 0;
-        return currentClauseSet;
+        return aClauseSet;
     }
+    resultPtr->satOrNot = -1;
     
     struct clause * lastClausePtr = NULL;
     
     struct literal * lastLiteralPtr = NULL;
-    struct literal * currentLiteralPtr = currentClausePtr->firstLiteral;
+    struct literal * currentLiteralPtr = NULL;
     
     while (currentClausePtr)
     {
-        if (currentClausePtr->firstLiteral == NULL)
-        {
-            resultPtr->satOrNot = 0;
-            return currentClauseSet;
-        }
         currentLiteralPtr = currentClausePtr->firstLiteral;
         lastLiteralPtr = NULL;
         
@@ -323,14 +292,14 @@ struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLit
             {
                 if (!lastClausePtr) // current clause is the first clause of the whole clause set
                 {
-                    currentClauseSet.firstClause = currentClausePtr->nextClause;
+                    aClauseSet.firstClause = currentClausePtr->nextClause;
                     freeClause(currentClausePtr);
-                    currentClausePtr = currentClauseSet.firstClause;
+                    currentClausePtr = aClauseSet.firstClause;
                     
-                    if (currentClauseSet.firstClause == NULL) // empty clause set
+                    if (aClauseSet.firstClause == NULL) // empty clause set
                     {
                         resultPtr->satOrNot = 1;
-                        return currentClauseSet;
+                        return aClauseSet;
                     }
                 }
                 else
@@ -339,7 +308,7 @@ struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLit
                     freeClause(currentClausePtr);
                     currentClausePtr = lastClausePtr->nextClause;
                 }
-                
+                // should start traverse the new current clause
                 if (currentClausePtr)
                     currentLiteralPtr = currentClausePtr->firstLiteral;
                 else
@@ -358,7 +327,7 @@ struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLit
                     if (currentClausePtr->firstLiteral == NULL) // empty clause
                     {
                         resultPtr->satOrNot = 0;
-                        return currentClauseSet;
+                        return aClauseSet;
                     }
                 }
                 else
@@ -367,7 +336,7 @@ struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLit
                     freeLiteral(currentLiteralPtr);
                     currentLiteralPtr = lastLiteralPtr->nextLiteral;
                 }
-                
+                continue;
             }
             lastLiteralPtr = currentLiteralPtr;
             if (currentLiteralPtr)
@@ -379,19 +348,20 @@ struct clauseSet unitPropagation(struct clauseSet currentClauseSet, int aUnitLit
             currentClausePtr = currentClausePtr->nextClause;
     }
     
-    return currentClauseSet;
+    return aClauseSet;
 }
 
 
 
 //================stack related=====================
 /* push */
-struct backTrackStackNode * push(struct backTrackStackNode * head, struct clauseSet aClauseSet)
+struct backTrackStackNode * push(struct backTrackStackNode * head, struct clauseSet aClauseSet, int theOtherChoice)
 {
     struct backTrackStackNode * nodePtr = (struct backTrackStackNode *) malloc(sizeof(struct backTrackStackNode));
     nodePtr->data.numOfClause = aClauseSet.numOfClause;
     nodePtr->data.numOfLiteral = aClauseSet.numOfLiteral;
     nodePtr->data.firstClause = NULL;
+    nodePtr->otherChoice = theOtherChoice;
     
     //struct clause * firstClausePtr = NULL;
     struct clause * currentClausePtr = NULL;
@@ -444,11 +414,12 @@ struct backTrackStackNode * push(struct backTrackStackNode * head, struct clause
     return nodePtr;
 }
 /* pop */
-struct backTrackStackNode * pop(struct backTrackStackNode * head, struct clauseSet * clauseSetPtr)
+struct backTrackStackNode * pop(struct backTrackStackNode * head, struct clauseSet * clauseSetPtr, int * branchLiteral)
 {
     if (!head)
         return NULL;
     *clauseSetPtr = head->data;
+    *branchLiteral = head->otherChoice;
     struct backTrackStackNode * temp = head->next;
     free(head);
     return temp;
@@ -471,29 +442,7 @@ void freeClause(struct clause * clausePtr)
     }
 }
 
-
-/* branch stack */
-struct branchStackNode * branchStackPush(struct branchStackNode * head, int theOtherChoice)
-{
-    struct branchStackNode * newNodePtr = (struct branchStackNode *) malloc(sizeof(struct branchStackNode));
-    newNodePtr->theOtherChoice = theOtherChoice;
-    newNodePtr->next = NULL;
-    if (!head)
-        return newNodePtr;
-    newNodePtr->next = head;
-    return newNodePtr;
-}
-struct branchStackNode * branchStackPop(struct branchStackNode * head, int * otherChoicePtr)
-{
-    if (!head)
-        return NULL;
-    *otherChoicePtr = head->theOtherChoice;
-    struct branchStackNode * temp = head->next;
-    free(head);
-    return temp;
-}
-
-/* write the result of DPLL to a file */
+/* write the result of DPLL to a res file */
 void writeToFile(const char * fileName, int satOrNot, int *arrHead, int noOfLiteral, double timeTaken)
 {
     FILE *fp;
@@ -501,8 +450,10 @@ void writeToFile(const char * fileName, int satOrNot, int *arrHead, int noOfLite
     if ((fp = fopen(destination, "w")) == NULL)
     {
         fprintf(stdout, "Can't open \"%s\" file.\n", destination);
+        free(destination);
         exit(EXIT_FAILURE);
     }
+    free(destination);
     
     fprintf(fp, "s %d\n", satOrNot);
     
@@ -518,9 +469,11 @@ void writeToFile(const char * fileName, int satOrNot, int *arrHead, int noOfLite
     if (fclose(fp) != 0)
         fprintf(stderr,"Error closing file\n");
 }
+
 char * changeExtension(const char *filename)
 {
-    char * destination = (char *) malloc(STLEN*sizeof(char));
+    size_t nameLength = strlen(filename) + 1;
+    char * destination = (char *) malloc(nameLength*sizeof(char));
     strcpy(destination, filename);
     char *end = destination + strlen(destination);
     
@@ -539,7 +492,34 @@ char * changeExtension(const char *filename)
 }
 
 /* check the validation of the result, valid return 1, invalid return 0 */
-int checkValidation(struct clauseSet, const char *)
+int checkValidation(struct clauseSet aClauseSet, struct result theResult)
 {
-    
+    printf("开始验证\n");
+    struct result validationResult;
+    validationResult.satOrNot = -1;
+    validationResult.noOfLiteral = aClauseSet.numOfLiteral;
+    validationResult.arrHead = NULL;
+    int index;
+    int literal;
+    /*
+     for (index = 1; index <= theResult.noOfLiteral; index++)
+     {
+     printf("%d\t", theResult.arrHead[index-1]);
+     }
+     */
+    for (index = 1; index <= theResult.noOfLiteral; index++)
+    {
+        //printf("\nbefore unit propagation\n\n");
+        //traverseClauseSet(aClauseSet);
+        literal = theResult.arrHead[index-1] == 1 ? index : -index;
+        //printf("\nunit literal : %d\n", literal);
+        aClauseSet = unitPropagation(aClauseSet, literal, &validationResult);
+        //printf("\nafter unit propagation\n\n");
+        //traverseClauseSet(aClauseSet);
+        //printf("\nvalidation: %d\n", validationResult.satOrNot);
+        if (validationResult.satOrNot != -1)
+            return validationResult.satOrNot;
+    }
+    return validationResult.satOrNot;
 }
+
